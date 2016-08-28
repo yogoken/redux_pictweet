@@ -1,19 +1,22 @@
 import React, { PropTypes } from 'react'
 import Tweet from '../components/Tweet'
 import { connect } from 'react-redux'
-import { deleteTweet, updateTweet } from '../actions'
+import { deleteTweetAsync, updateTweetAsync, fetchTweets } from '../actions'
 
 class TweetList extends React.Component{
+  componentDidMount(){
+    this.props.fetchTweets()
+  }
   render(){
-    const {tweets, updateTweet, deleteTweet} = this.props
+    const {tweets, updateTweetAsync, deleteTweetAsync} = this.props
     return(
       <div className="tweet-list">
         {tweets.map((tweet) =>
           <Tweet
             key={tweet.id}
             {...tweet}
-            onClickDeleteButton={() => deleteTweet(tweet.id)}
-            onBlurInputField={(text, image) => updateTweet(tweet.id, text, image)}
+            onClickDeleteButton={() => deleteTweetAsync(tweet.id)}
+            onBlurInputField={(text, image) => updateTweetAsync(tweet.id, text, image)}
           />
         )}
       </div>
@@ -23,12 +26,13 @@ class TweetList extends React.Component{
 
 TweetList.propTypes = {
   tweets: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired
   }).isRequired).isRequired,
-  deleteTweet: PropTypes.func.isRequired,
-  updateTweet: PropTypes.func.isRequired,
+  deleteTweetAsync: PropTypes.func.isRequired,
+  updateTweetAsync: PropTypes.func.isRequired,
+  fetchTweets: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -39,11 +43,14 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    deleteTweet: (id) => {
-      dispatch(deleteTweet(id))
+    deleteTweetAsync: (id) => {
+      dispatch(deleteTweetAsync(id))
     },
-    updateTweet: (id, text, image) => {
-      dispatch(updateTweet(id, text, image))
+    updateTweetAsync: (id, text, image) => {
+      dispatch(updateTweetAsync(id, text, image))
+    },
+    fetchTweets: () => {
+      dispatch(fetchTweets())
     }
   }
 }

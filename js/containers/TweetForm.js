@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
-import { createTweet } from '../actions'
+import { createTweetAsync } from '../actions'
 
 class TweetForm extends React.Component{
   render(){
@@ -14,7 +14,7 @@ class TweetForm extends React.Component{
           if (!textField.value.trim() ||  !imageField.value.trim()) {
             return
           }
-          this.props.createTweet(textField.value, imageField.value)
+          this.props.createTweetAsync(textField.value, imageField.value)
           textField.value = ''
           imageField.value = ''
         }}>
@@ -35,7 +35,7 @@ class TweetForm extends React.Component{
 }
 
 TweetForm.propTypes = {
-  createTweet: PropTypes.func.isRequired
+  createTweetAsync: PropTypes.func.isRequired
 }
 
 const mapStateToProps = (state) => {
@@ -46,8 +46,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    createTweet: (text, image) => {
-      dispatch(createTweet(text, image))
+    createTweetAsync: (text, image) => {
+      dispatch(createTweetAsync(text, image))
     }
   }
 }
