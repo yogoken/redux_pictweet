@@ -21,6 +21,8 @@ var _TweetList2 = _interopRequireDefault(_TweetList);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -30,20 +32,67 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
 
-  function App() {
+  function App(props) {
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+    _this.state = {
+      tweets: []
+    };
+    return _this;
   }
 
   _createClass(App, [{
+    key: 'uuid',
+    value: function uuid() {
+      var i = void 0,
+          random = void 0;
+      var uuid = '';
+      for (i = 0; i < 32; i++) {
+        random = Math.random() * 16 | 0;
+        if (i === 8 || i === 12 || i === 16 || i === 20) {
+          uuid += '-';
+        }
+        uuid += (i === 12 ? 4 : i === 16 ? random & 3 | 8 : random).toString(16);
+      }
+      return uuid;
+    }
+  }, {
+    key: 'createTweet',
+    value: function createTweet(text, image) {
+      this.setState({ tweets: [].concat(_toConsumableArray(this.state.tweets), [{ id: this.uuid(), text: text, image: image }]) });
+    }
+  }, {
+    key: 'deleteTweet',
+    value: function deleteTweet(id) {
+      this.setState({ tweets: this.state.tweets.filter(function (tweet) {
+          return tweet.id !== id;
+        }) });
+    }
+  }, {
+    key: 'updateTweet',
+    value: function updateTweet(id, text, type) {
+      var newTweets = this.state.tweets.map(function (t) {
+        if (t.id == id) {
+          if (type == "text") {
+            t.text = text;
+          } else if (type == "image") {
+            t.image = text;
+          }
+        }
+        return t;
+      });
+      this.setState({ tweets: newTweets });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
         'div',
         { className: 'contents row' },
-        _react2.default.createElement(_TweetForm2.default, null),
-        _react2.default.createElement(_TweetList2.default, null)
+        _react2.default.createElement(_TweetForm2.default, { onSubmitTweetForm: this.createTweet.bind(this) }),
+        _react2.default.createElement(_TweetList2.default, { tweets: this.state.tweets, deleteTweet: this.deleteTweet.bind(this), updateTweet: this.updateTweet.bind(this) })
       );
     }
   }]);
@@ -86,9 +135,16 @@ var Tweet = function (_React$Component) {
   _createClass(Tweet, [{
     key: "render",
     value: function render() {
+      var _props = this.props;
+      var text = _props.text;
+      var image = _props.image;
+      var id = _props.id;
+      var onClickDeleteButton = _props.onClickDeleteButton;
+      var onBlurInputField = _props.onBlurInputField;
+
       return _react2.default.createElement(
         "div",
-        { className: "content__post" },
+        { className: "content__post", style: { backgroundImage: "url(" + image + ")" } },
         _react2.default.createElement(
           "div",
           { className: "more" },
@@ -105,7 +161,7 @@ var Tweet = function (_React$Component) {
               null,
               _react2.default.createElement(
                 "a",
-                null,
+                { onClick: onClickDeleteButton },
                 "削除"
               )
             )
@@ -114,11 +170,15 @@ var Tweet = function (_React$Component) {
         _react2.default.createElement(
           "p",
           null,
-          "HelloWorld"
+          text
         ),
-        _react2.default.createElement("input", { type: "text" }),
+        _react2.default.createElement("input", { type: "text", defaultValue: text, onBlur: function onBlur(e) {
+            onBlurInputField(e.target.value, "text");
+          } }),
         _react2.default.createElement("br", null),
-        _react2.default.createElement("input", { type: "text" })
+        _react2.default.createElement("input", { type: "text", defaultValue: image, onBlur: function onBlur(e) {
+            onBlurInputField(e.target.value, "image");
+          } })
       );
     }
   }]);
@@ -126,10 +186,17 @@ var Tweet = function (_React$Component) {
   return Tweet;
 }(_react2.default.Component);
 
+Tweet.propTypes = {
+  onClickDeleteButton: _react.PropTypes.func.isRequired,
+  onBlurInputField: _react.PropTypes.func.isRequired,
+  text: _react.PropTypes.string.isRequired,
+  image: _react.PropTypes.string.isRequired
+};
+
 exports.default = Tweet;
 
 },{"react":176}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -137,7 +204,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -159,22 +226,39 @@ var TweetForm = function (_React$Component) {
   }
 
   _createClass(TweetForm, [{
-    key: "render",
+    key: 'render',
     value: function render() {
+      var textField = void 0;
+      var imageField = void 0;
+      var onSubmitTweetForm = this.props.onSubmitTweetForm;
+
+
       return _react2.default.createElement(
-        "div",
-        { className: "tweet-form" },
+        'div',
+        { className: 'tweet-form' },
         _react2.default.createElement(
-          "form",
-          null,
+          'form',
+          { onSubmit: function onSubmit(e) {
+              e.preventDefault();
+              if (!textField.value.trim() || !imageField.value.trim()) {
+                return;
+              }
+              onSubmitTweetForm(textField.value, imageField.value);
+              textField.value = '';
+              imageField.value = '';
+            } },
           _react2.default.createElement(
-            "h3",
+            'h3',
             null,
-            "投稿する"
+            '投稿する'
           ),
-          _react2.default.createElement("input", null),
-          _react2.default.createElement("input", null),
-          _react2.default.createElement("input", { type: "submit" })
+          _react2.default.createElement('input', { ref: function ref(node) {
+              textField = node;
+            } }),
+          _react2.default.createElement('input', { ref: function ref(node) {
+              imageField = node;
+            } }),
+          _react2.default.createElement('input', { type: 'submit' })
         )
       );
     }
@@ -182,6 +266,10 @@ var TweetForm = function (_React$Component) {
 
   return TweetForm;
 }(_react2.default.Component);
+
+TweetForm.propTypes = {
+  onSubmitTweetForm: _react.PropTypes.func.isRequired
+};
 
 exports.default = TweetForm;
 
@@ -191,6 +279,8 @@ exports.default = TweetForm;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -222,16 +312,42 @@ var TweetList = function (_React$Component) {
   _createClass(TweetList, [{
     key: 'render',
     value: function render() {
+      var _props = this.props;
+      var tweets = _props.tweets;
+      var updateTweet = _props.updateTweet;
+      var deleteTweet = _props.deleteTweet;
+
       return _react2.default.createElement(
         'div',
         { className: 'tweet-list' },
-        _react2.default.createElement(_Tweet2.default, null)
+        tweets.map(function (tweet) {
+          return _react2.default.createElement(_Tweet2.default, _extends({
+            key: tweet.id
+          }, tweet, {
+            onClickDeleteButton: function onClickDeleteButton() {
+              return deleteTweet(tweet.id);
+            },
+            onBlurInputField: function onBlurInputField(text, type) {
+              return updateTweet(tweet.id, text, type);
+            }
+          }));
+        })
       );
     }
   }]);
 
   return TweetList;
 }(_react2.default.Component);
+
+TweetList.propTypes = {
+  tweets: _react.PropTypes.arrayOf(_react.PropTypes.shape({
+    id: _react.PropTypes.string.isRequired,
+    text: _react.PropTypes.string.isRequired,
+    image: _react.PropTypes.string.isRequired
+  }).isRequired).isRequired,
+  deleteTweet: _react.PropTypes.func.isRequired,
+  updateTweet: _react.PropTypes.func.isRequired
+};
 
 exports.default = TweetList;
 
