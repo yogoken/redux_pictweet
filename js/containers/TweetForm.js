@@ -1,10 +1,11 @@
 import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+import { createTweet } from '../actions'
 
 class TweetForm extends React.Component{
   render(){
     let textField
     let imageField
-    const { onSubmitTweetForm } = this.props
 
     return(
       <div className="tweet-form">
@@ -13,7 +14,7 @@ class TweetForm extends React.Component{
           if (!textField.value.trim() ||  !imageField.value.trim()) {
             return
           }
-          onSubmitTweetForm(textField.value, imageField.value)
+          this.props.createTweet(textField.value, imageField.value)
           textField.value = ''
           imageField.value = ''
         }}>
@@ -26,7 +27,7 @@ class TweetForm extends React.Component{
             imageField = node
           }} />
 
-        <input type="submit" />
+        <input type="submit"></ input>
         </form>
       </div>
     )
@@ -34,7 +35,23 @@ class TweetForm extends React.Component{
 }
 
 TweetForm.propTypes = {
-  onSubmitTweetForm: PropTypes.func.isRequired
+  createTweet: PropTypes.func.isRequired
 }
+
+const mapStateToProps = (state) => {
+  return {
+    state: state
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    createTweet: (text, image) => {
+      dispatch(createTweet(text, image))
+    }
+  }
+}
+
+TweetForm = connect(mapStateToProps, mapDispatchToProps)(TweetForm)
 
 export default TweetForm

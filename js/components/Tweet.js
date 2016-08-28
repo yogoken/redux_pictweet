@@ -2,6 +2,9 @@ import React, { PropTypes } from 'react'
 
 class Tweet extends React.Component{
   render(){
+    let textField
+    let imageField
+
     const {text, image, id, onClickDeleteButton, onBlurInputField} = this.props
     return(
       <div className="content__post" style={{ backgroundImage: `url(${image})`}}>
@@ -16,13 +19,15 @@ class Tweet extends React.Component{
           </ul>
         </div>
         <p>{text}</p>
-        <input type="text" defaultValue={text} onBlur={e => {
-          onBlurInputField(e.target.value, "text");
-        }}/>
+        <input type="text" defaultValue={text}
+          onBlur={e => { onBlurInputField(e.target.value, imageField.value);}}
+          ref={node => { textField = node }}
+        />
         <br></br>
-        <input type="text" defaultValue={image} onBlur={e => {
-            onBlurInputField(e.target.value, "image");
-        }}/>
+        <input type="text" defaultValue={image}
+          onBlur={e => { onBlurInputField(textField.value ,e.target.value);}}
+          ref={node => { imageField = node }}
+        />
       </div>
     );
   }
